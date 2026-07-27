@@ -228,6 +228,9 @@ CREATE TABLE public.profile (
     misc_progress smallint DEFAULT 0,
     misc_cooldown bigint DEFAULT 1,
     misc_reward smallint DEFAULT 0,
+    weekly_quest character varying(10) DEFAULT ''::character varying,
+    weekly_progress smallint DEFAULT 0,
+    weekly_cattypes smallint[] DEFAULT '{}'::smallint[],
     reminder_catch bigint DEFAULT 0,
     reminder_misc bigint DEFAULT 0,
     reminders_enabled boolean DEFAULT false,
@@ -304,7 +307,10 @@ CREATE TABLE public.profile (
     fish_caught integer DEFAULT 0,
     rarest_fish character varying(15) DEFAULT ''::character varying,
     fisherman boolean DEFAULT false,
-    pro_fisher boolean DEFAULT false
+    pro_fisher boolean DEFAULT false,
+    bonus_catches integer DEFAULT 0,
+    math_jumpscare boolean DEFAULT false,
+    scratchcards smallint DEFAULT 0
 );
 
 ALTER TABLE public.profile OWNER TO cat_bot;
@@ -376,7 +382,8 @@ CREATE TABLE public."user" (
     puzzle_badge boolean DEFAULT false,
     plush_badge boolean DEFAULT false,
     second_birthday_badge boolean DEFAULT false,
-    tutorial_state smallint DEFAULT 0
+    tutorial_state smallint DEFAULT 0,
+    widget_guild_id bigint DEFAULT 0
 );
 
 ALTER TABLE public."user" OWNER TO cat_bot;
@@ -391,7 +398,9 @@ CREATE TABLE public.server (
     auto_delete_achievements boolean DEFAULT false,
     auto_delete_catches boolean DEFAULT false,
     mute_achievements boolean DEFAULT false,
-    anti_double_catch boolean DEFAULT false
+    anti_double_catch boolean DEFAULT false,
+    legacy_catching boolean DEFAULT false,
+    name text DEFAULT ''
 );
 
 ALTER TABLE public.server OWNER TO cat_bot;
@@ -433,6 +442,8 @@ CREATE UNIQUE INDEX profile_user_id_guild_id ON public.profile USING btree (user
 CREATE INDEX reminder_time ON public.reminder USING btree ("time");
 
 CREATE INDEX idx_partial_blessings ON public."user" (rain_minutes_bought) WHERE blessings_enabled = true;
+
+CREATE INDEX idx_vote_streak ON public."user" (vote_streak) WHERE vote_streak >= 100;
 
 CREATE INDEX idx_slot_spins_partial ON public.profile (slot_spins) WHERE slot_spins > 0;
 
